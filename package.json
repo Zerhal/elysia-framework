@@ -1,0 +1,44 @@
+{
+  "name": "aethora-api",
+  "version": "1.0.50",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "bun run --watch src/index.ts",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write 'src/**/*.ts'",
+    "precommit": "bun run lint && bun run format",
+    "prepare": "husky",
+    "clean": "rimraf dist"
+  },
+  "bun": {
+    "alias": {
+      "@": "./src"
+    }
+  },
+  "dependencies": {
+    "@elysiajs/swagger": "^1.0.5",
+    "@eslint/js": "^9.6.0",
+    "@prisma/client": "5.16.1",
+    "@types/eslint__js": "^8.42.3",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "elysia": "latest",
+    "eslint": "^9.6.0",
+    "jsonwebtoken": "^9.0.2",
+    "lint-staged": "^15.2.7",
+    "prettier": "^3.3.2",
+    "typescript-eslint": "^7.15.0",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.14.9",
+    "bun-types": "latest",
+    "husky": "^9.0.11",
+    "prisma": "^5.16.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
+  },
+  "module": "src/index.js"
+}
