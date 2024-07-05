@@ -1,4 +1,4 @@
-import { createHash, createHmac } from 'crypto'
+import { randomBytes, pbkdf2Sync } from 'crypto'
 
 export class PasswordHasher {
   private static readonly HASH_ITERATIONS = 10000
@@ -25,27 +25,25 @@ export class PasswordHasher {
    * Hashes a password using a salt and a cryptographic hash function.
    *
    * @param {string} password - The password to be hashed.
-   * @return {string} The hashed password in the format "salt:hash".
+   * @return {string} The hashed password in the format "iterations:salt:hash".
    */
   static hashPassword(password: string): string {
-    const salt = createHash('sha256')
-      .update(Date.now().toString())
-      .digest('hex')
-      .substr(0, 16)
-    const hash = createHmac(
+    const salt = randomBytes(16).toString('hex')
+    const hash = pbkdf2Sync(
+      password,
+      salt,
+      PasswordHasher.HASH_ITERATIONS,
+      PasswordHasher.HASH_KEYLEN,
       PasswordHasher.HASH_DIGEST,
-      PasswordHasher.getSecret(),
-    )
-      .update(password + salt)
-      .digest('hex')
+    ).toString('hex')
 
-    return `${salt}:${hash}`
+    return `${PasswordHasher.HASH_ITERATIONS}:${salt}:${hash}`
   }
 
   /**
    * Verifies if the provided password matches the stored password.
    *
-   * @param {string} storedPassword - The stored password in the format "salt:hash".
+   * @param {string} storedPassword - The stored password in the format "iterations:salt:hash".
    * @param {string} providedPassword - The password provided by the user.
    * @return {boolean} Returns true if the provided password matches the stored password, false otherwise.
    */
@@ -53,13 +51,14 @@ export class PasswordHasher {
     storedPassword: string,
     providedPassword: string,
   ): boolean {
-    const [salt, storedHash] = storedPassword.split(':')
-    const hash = createHmac(
+    const [iterations, salt, storedHash] = storedPassword.split(':')
+    const hash = pbkdf2Sync(
+      providedPassword,
+      salt,
+      parseInt(iterations, 10),
+      PasswordHasher.HASH_KEYLEN,
       PasswordHasher.HASH_DIGEST,
-      PasswordHasher.getSecret(),
-    )
-      .update(providedPassword + salt)
-      .digest('hex')
+    ).toString('hex')
 
     return storedHash === hash
   }
